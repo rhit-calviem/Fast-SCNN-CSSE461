@@ -14,6 +14,7 @@ def parse_args():
                         help='Dataset name (default: citys)')
     parser.add_argument('--input-pic', type=str, required=True,
                         help='Path to the input image')
+    # Added parser for model, otherwise it onlny ever used the original weights
     parser.add_argument('--resume', type=str, required=True,
                         help='Path to the .pth model weights')
     parser.add_argument('--outdir', type=str, default='test_result',
@@ -32,8 +33,9 @@ def demo():
     model.load_state_dict(torch.load(args.resume, map_location=device))
     model.eval()
 
-    # Load and preprocess image
+    # Load image
     input_image = Image.open(args.input_pic).convert('RGB')
+    # Added preprocessing step to make sure other images could also work
     input_image = input_image.resize((2048, 1024), Image.BILINEAR)
 
     transform = transforms.Compose([
