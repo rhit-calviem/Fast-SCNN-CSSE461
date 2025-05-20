@@ -1,6 +1,9 @@
 # Fast-SCNN: Fast Semantic Segmentation Network
 A PyTorch implementation of [Fast-SCNN: Fast Semantic Segmentation Network](https://arxiv.org/pdf/1902.04502) from the paper by Rudra PK Poudel, Stephan Liwicki.
 
+**Modified by Matteo calviello & Carter Kirtz** <br>
+Explanation in INSTRUCTION.md
+
 <p align="center"><img width="100%" src="./png/Fast-SCNN.png" /></p>
 
 ## Table of Contents
