@@ -87,8 +87,8 @@ class Trainer(object):
 
         # create network
         self.model = get_fast_scnn(dataset=args.dataset, aux=args.aux)
-        if torch.cuda.device_count() > 1:
-            self.model = torch.nn.DataParallel(self.model, device_ids=[0, 1, 2])
+        # if torch.cuda.device_count() > 1:
+        #     self.model = torch.nn.DataParallel(self.model, device_ids=[0, 1, 2])
         self.model.to(args.device)
 
         # resume checkpoint if needed
@@ -145,11 +145,14 @@ class Trainer(object):
                         epoch, args.epochs, i + 1, len(self.train_loader),
                         time.time() - start_time, cur_lr, loss.item()))
 
-            if self.args.no_val:
-                # save every epoch
-                save_checkpoint(self.model, self.args, is_best=False)
-            else:
+            # if self.args.no_val:
+            #     # save every epoch
+            #     save_checkpoint(self.model, self.args, is_best=False)
+            # else:
+            #     self.validation(epoch)
+            if not self.args.no_val and epoch == self.args.epochs - 1:
                 self.validation(epoch)
+
 
         save_checkpoint(self.model, self.args, is_best=False)
 
@@ -180,13 +183,13 @@ def save_checkpoint(model, args, is_best=False):
     directory = os.path.expanduser(args.save_folder)
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename = '{}_{}.pth'.format(args.model, args.dataset)
+    filename = 'fast_scnn_citys_epoch50_final.pth'
     save_path = os.path.join(directory, filename)
     torch.save(model.state_dict(), save_path)
     if is_best:
         best_filename = '{}_{}_best_model.pth'.format(args.model, args.dataset)
         best_filename = os.path.join(directory, best_filename)
-        shutil.copyfile(filename, best_filename)
+        shutil.copyfile(save_path, best_filename)
 
 
 if __name__ == '__main__':

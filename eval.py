@@ -30,7 +30,7 @@ class Evaluator(object):
                                           batch_size=1,
                                           shuffle=False)
         # create network
-        self.model = get_fast_scnn(args.dataset, aux=args.aux, pretrained=True, root=args.save_folder).to(args.device)
+        self.model = get_fast_scnn(args.dataset, aux=args.aux, pretrained=False, root=args.save_folder).to(args.device)
         print('Finished loading model!')
 
         self.metric = SegmentationMetric(val_dataset.num_class)

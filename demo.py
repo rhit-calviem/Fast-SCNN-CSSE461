@@ -1,55 +1,62 @@
 import os
 import argparse
 import torch
-
+from PIL import Image
 from torchvision import transforms
 from models.fast_scnn import get_fast_scnn
-from PIL import Image
 from utils.visualize import get_color_pallete
 
-parser = argparse.ArgumentParser(
-    description='Predict segmentation result from a given image')
-parser.add_argument('--model', type=str, default='fast_scnn',
-                    help='model name (default: fast_scnn)')
-parser.add_argument('--dataset', type=str, default='citys',
-                    help='dataset name (default: citys)')
-parser.add_argument('--weights-folder', default='./weights',
-                    help='Directory for saving checkpoint models')
-parser.add_argument('--input-pic', type=str,
-                    default='./datasets/citys/leftImg8bit/test/berlin/berlin_000000_000019_leftImg8bit.png',
-                    help='path to the input picture')
-parser.add_argument('--outdir', default='./test_result', type=str,
-                    help='path to save the predict result')
-
-parser.add_argument('--cpu', dest='cpu', action='store_true')
-parser.set_defaults(cpu=False)
-
-args = parser.parse_args()
-
+def parse_args():
+    parser = argparse.ArgumentParser(description='Fast-SCNN Demo')
+    parser.add_argument('--model', type=str, default='fast_scnn',
+                        help='Model name (default: fast_scnn)')
+    parser.add_argument('--dataset', type=str, default='citys',
+                        help='Dataset name (default: citys)')
+    parser.add_argument('--input-pic', type=str, required=True,
+                        help='Path to the input image')
+    parser.add_argument('--resume', type=str, required=True,
+                        help='Path to the .pth model weights')
+    parser.add_argument('--outdir', type=str, default='test_result',
+                        help='Directory to save the result image')
+    parser.add_argument('--cpu', action='store_true', default=False,
+                        help='Use CPU only')
+    return parser.parse_args()
 
 def demo():
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # output folder
-    if not os.path.exists(args.outdir):
-        os.makedirs(args.outdir)
+    args = parse_args()
+    device = torch.device('cpu' if args.cpu or not torch.cuda.is_available() else 'cuda')
 
-    # image transform
+    # Load model
+    model = get_fast_scnn(args.dataset, pretrained=False).to(device)
+    print(f"[INFO] Loading model from {args.resume}")
+    model.load_state_dict(torch.load(args.resume, map_location=device))
+    model.eval()
+
+    # Load and preprocess image
+    input_image = Image.open(args.input_pic).convert('RGB')
+    input_image = input_image.resize((2048, 1024), Image.BILINEAR)
+
     transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        transforms.Normalize([.485, .456, .406], [.229, .224, .225]),
     ])
-    image = Image.open(args.input_pic).convert('RGB')
-    image = transform(image).unsqueeze(0).to(device)
-    model = get_fast_scnn(args.dataset, pretrained=True, root=args.weights_folder, map_cpu=args.cpu).to(device)
-    print('Finished loading model!')
-    model.eval()
-    with torch.no_grad():
-        outputs = model(image)
-    pred = torch.argmax(outputs[0], 1).squeeze(0).cpu().data.numpy()
-    mask = get_color_pallete(pred, args.dataset)
-    outname = os.path.splitext(os.path.split(args.input_pic)[-1])[0] + '.png'
-    mask.save(os.path.join(args.outdir, outname))
+    image_tensor = transform(input_image).unsqueeze(0).to(device)
 
+    # Run inference
+    with torch.no_grad():
+        output = model(image_tensor)
+        pred = torch.argmax(output[0], 1).squeeze(0).cpu().numpy()
+
+    # Convert prediction to color mask
+    mask = get_color_pallete(pred, args.dataset)
+
+    # Save result
+    if not os.path.exists(args.outdir):
+        os.makedirs(args.outdir)
+    image_name = os.path.basename(args.input_pic).replace('.jpg', '').replace('.png', '')
+    save_path = os.path.join(args.outdir, f'{image_name}_segmentation.png')
+    mask.save(save_path)
+    print(f"[INFO] Saved segmentation result to {save_path}")
 
 if __name__ == '__main__':
     demo()
