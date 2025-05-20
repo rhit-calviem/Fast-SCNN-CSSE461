@@ -80,7 +80,15 @@ The code to evaluate is fully provided and should not require any change. Run th
 The code to demo a model on any image is provided, same with all image processing so images of all sizes and shapes should be able to run. We have saved in the ./datasets directory the images we demoed our models on, so feel free to use these to check results. To run the demo, run this code: <br>
 `python demo.py \--input-pic ./png/test_input.png \--resume ./weights/fast_scnn_retrained.pth \--outdir ./test_result_custom`
 <br>
-You will need to update the correct path to the picture and the model, the output directory is already given to you.
+You will need to update the correct path to the picture and the model, the output directory is already given to you. Once the demo is finished, the outputted segmented image will be saved in the output directory.
+
+---
+
+## Sample Outputs with our Trained Model
+
+1. An image from the cityscape dataset
+   
+
 
 
  
