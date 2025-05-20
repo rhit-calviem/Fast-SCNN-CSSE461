@@ -89,12 +89,14 @@ You will need to update the correct path to the picture and the model, the outpu
 | Input Image | → | Predicted Segmentation |
 |-------------|----|------------------------|
 | <img width="500" src="./datasets/berlin_000000_000019_leftImg8bit.png" /> | ➡️ | <img width="500" src="./test_result_custom/cityscapes_retrained.png" /> |
-|-------------|----|------------------------|
 | <img width="500" src="./datasets/nab.png" /> | ➡️ | <img width="500" src="./test_result_custom/rose_retrained.png" /> |
-|-------------|----|------------------------|
 | <img width="500" src="./datasets/brain.png" /> | ➡️ | <img width="500" src="./test_result_custom/brain_retrained.png" /> |
-|-------------|----|------------------------|
 | <img width="500" src="./datasets/src.png" /> | ➡️ | <img width="500" src="./test_result_custom/src_retrained.png" /> |
+
+---
+**Thank you** <br>
+Matteo Calviello & Carter Kirtz
+
 
 
 
