@@ -14,7 +14,7 @@ def parse_args():
                         help='Dataset name (default: citys)')
     parser.add_argument('--input-pic', type=str, required=True,
                         help='Path to the input image')
-    # Added parser for model, otherwise it onlny ever used the original weights
+    # Added parser for model, otherwise it only ever used the original weights
     parser.add_argument('--resume', type=str, required=True,
                         help='Path to the .pth model weights')
     parser.add_argument('--outdir', type=str, default='test_result',
@@ -27,7 +27,7 @@ def demo():
     args = parse_args()
     device = torch.device('cpu' if args.cpu or not torch.cuda.is_available() else 'cuda')
 
-    # Load model
+    # Load model, set boolean to False to use other models besides original
     model = get_fast_scnn(args.dataset, pretrained=False).to(device)
     print(f"[INFO] Loading model from {args.resume}")
     model.load_state_dict(torch.load(args.resume, map_location=device))
